@@ -1,0 +1,13 @@
+name: github actions test
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check environment
+        run: |
+          printenv
