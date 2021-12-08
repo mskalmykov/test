@@ -1,8 +1,7 @@
 name: github actions test
 on:
   push:
-    tags:
-      - v[0-9].[0-9]+
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,4 +12,3 @@ jobs:
           printenv | grep GIT
           git branch --show-current
           git branch
-          git version
