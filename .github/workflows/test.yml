@@ -12,3 +12,5 @@ jobs:
         run: |
           printenv | grep GIT
           git branch --show-current
+          git branch
+          git version
