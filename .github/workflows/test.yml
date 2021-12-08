@@ -11,3 +11,4 @@ jobs:
       - name: Check environment
         run: |
           printenv | grep GIT
+          git branch --show-current
