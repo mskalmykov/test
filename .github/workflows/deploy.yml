@@ -14,7 +14,13 @@ jobs:
     steps:
     - name: Checkout repository 
       uses: actions/checkout@v2
-    
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     - name: Set environment variables
       run: |
         # Set k8s namespace name
