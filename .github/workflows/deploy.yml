@@ -97,5 +97,5 @@ jobs:
       env:
         KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_AWS }}
       with:
-        args: set image deploy/nhltop *=${{ env.IMAGE_ECR }}
+        args: -n ${{ env.NAMESPACE }} set image deploy/nhltop *=${{ env.IMAGE_ECR }}
   
