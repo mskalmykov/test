@@ -68,6 +68,17 @@ jobs:
     - name: Push image to Azure
       run: docker push ${{ env.IMAGE_ACR }}
     
+    - name: Set kubernetes context for Azure
+      uses: azure/k8s-set-context@v2
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+    - name: Set deployment image for Azure
+      run: |
+        kubectl -n ${{ env.NAMESPACE }} \
+          set image deploy/nhltop *=${{ env.IMAGE_ACR }}
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -81,14 +92,10 @@ jobs:
     - name: Push image to AWS
       run: docker push ${{ env.IMAGE_ECR }}
     
-    - name: Set kubernetes context for Azure
-      uses: azure/k8s-set-context@v2
+    - name: Set deployment image for AWS
+      uses: kodermax/kubectl-aws-eks@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_AWS }}
       with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
-
-    - name: Set deployment image
-      run: |
-        kubectl -n ${{ env.NAMESPACE }} \
-          set image deploy/nhltop *=${{ env.IMAGE }}
-
+        args: set image deploy/nhltop *=${{ env.IMAGE_ECR }}
+  
