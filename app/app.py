@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from prometheus_flask_exporter import PrometheusMetrics
 from markupsafe import escape
+from cpu_load_generator import load_all_cores
 import mariadb
 import nhltop
 
@@ -15,6 +16,7 @@ def add_header(response):
 
     return response
 
+# Main page
 @app.route('/')
 def rt_main():
     # Try to connect to DB server
@@ -57,6 +59,14 @@ def rt_main():
 def rt_check():
     return 'ok'
 
+# CPU burning routine (to initiate autoscaling)
+@app.route('/cpuburn/<int:seconds>')
+@app.route('/cpuburn/')
+def cpu_burn(seconds = 60):
+    load_all_cores(duration_s=seconds, target_load=1.0)
+    return render_template('msg.j2', title = 'CPU burner', message = 'CPU stress complete')
+
+# DB update page
 @app.route('/update/<int:count>')
 @app.route('/update/')
 def rt_update(count = 3):
@@ -70,7 +80,6 @@ def rt_update(count = 3):
     # Update schema if needed
     nhltop.db_update_schema(db_conn)
 
-    #seasons_count = request.args.get('count', 3, type=int)
     if (count < 1):
         count = 1
 
@@ -102,13 +111,15 @@ def rt_update(count = 3):
                             message = """<p>Database is updated.
                               <a href="/">Return to the main page</a> to view.</p>""")
 
+# Player statistics page
 @app.route('/stats', methods=['GET'])
 def rt_stats():
     # Try to connect to DB server
     try:
         db_conn = nhltop.db_connect()
     except mariadb.Error as err:
-        return f'<p>Error no: {err.errno}, msg: {err.msg}</p>'
+        error_text = f'<p>Error no: {err.errno}, msg: {err.msg}</p>'
+        render_template('msg.j2', title = 'DB error', message = error_text)
 
     # Update schema if needed
     nhltop.db_update_schema(db_conn)
