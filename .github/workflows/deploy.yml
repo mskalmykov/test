@@ -56,6 +56,7 @@ jobs:
                -f "app/Dockerfile" \
                -t ${{ env.IMAGE_ACR }} \
                --label dockerfile-path=app/Dockerfile
+        docker tag ${{ env.IMAGE_ACR }} ${{ env.IMAGE_ECR }}
     
     - name: Login to Azure container registry 
       uses: azure/docker-login@v1
